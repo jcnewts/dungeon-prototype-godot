@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://da1dch38cajg2"]
+[gd_scene format=3 uid="uid://jhhj7avxq3k"]
 
-[ext_resource type="PackedScene" uid="uid://3kyhm13y0g45" path="res://first_person_char.tscn" id="1_lquwl"]
-[ext_resource type="PackedScene" uid="uid://bk5kauoc33spp" path="res://menu.tscn" id="3_h2yge"]
-[ext_resource type="Script" uid="uid://xyd0mxu5f6dk" path="res://Scripts/DungeonGen/dungeon_gen.gd" id="5_7mycd"]
-[ext_resource type="MeshLibrary" uid="uid://blb2xmtphwx7u" path="res://dungeon_tileset.tres" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://3kyhm13y0g45" path="res://first_person_char.tscn" id="1_kj3p2"]
+[ext_resource type="PackedScene" uid="uid://bk5kauoc33spp" path="res://menu.tscn" id="2_lc7k4"]
+[ext_resource type="MeshLibrary" uid="uid://blb2xmtphwx7u" path="res://dungeon_tileset.tres" id="3_jn4p2"]
+[ext_resource type="Script" uid="uid://xyd0mxu5f6dk" path="res://Scripts/DungeonGen/dungeon_gen.gd" id="4_ybq6y"]
+[ext_resource type="PackedScene" uid="uid://cqgm88tiobntd" path="res://rooms/room_t_02.tscn" id="5_lc7k4"]
 
 [sub_resource type="Sky" id="Sky_vho56"]
 
@@ -30,15 +31,16 @@ transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="Env" unique_id=278456439]
 environment = SubResource("Environment_vho56")
 
-[node name="FirstPersonChar" parent="." unique_id=160405242 instance=ExtResource("1_lquwl")]
+[node name="FirstPersonChar" parent="." unique_id=160405242 instance=ExtResource("1_kj3p2")]
 
-[node name="Menu" parent="." unique_id=803368180 instance=ExtResource("3_h2yge")]
+[node name="Menu" parent="." unique_id=803368180 instance=ExtResource("2_lc7k4")]
 
 [node name="GridMap" type="GridMap" parent="." unique_id=919807206]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
-mesh_library = ExtResource("5_lquwl")
+mesh_library = ExtResource("3_jn4p2")
 cell_size = Vector3(1, 1, 1)
 cell_center_y = false
 
 [node name="Dungeon" type="Node3D" parent="." unique_id=872031242]
-script = ExtResource("5_7mycd")
+script = ExtResource("4_ybq6y")
+starting_room_prefab = ExtResource("5_lc7k4")
