@@ -3,6 +3,7 @@ extends Node3D
 const room_size: int = 12 + 1
 
 @export var starting_room_prefab = preload("res://rooms/room_t_01.tscn")
+@export var open_door_prefab = preload("res://doors/door_open.tscn")
 @export var rooms_4_exits: RoomType = preload("res://RoomType_4.tres")
 
 var map:Dictionary = {}
@@ -31,9 +32,9 @@ const dir_vector = {
 
 const dir_rotation = {
 	Dir.E : 0,
-	Dir.N : 90,
+	Dir.S : 90,
 	Dir.W : 180,
-	Dir.S : 270
+	Dir.N : 270
 }
 
 var current_coord: Vector2i = Vector2i(0, 0)
@@ -58,6 +59,7 @@ func generate_branch():
 		var dir_vec = dir_vector.get(dir)
 		# add room
 		add_room(current_coord + dir_vec, RoomTypes.FOUR_EXIT)
+		add_connection(current_coord, dir)
 		current_coord = current_coord + dir_vec 
 
 func check_available_dirs(coord) -> Array[Dir]:
@@ -93,7 +95,13 @@ func add_room(coord, type: RoomTypes):
 			room = starting_room_prefab
 		RoomTypes.FOUR_EXIT:
 			room = rooms_4_exits.scenes.pick_random()
-	room = room.instantiate() 
+	room = room.instantiate()
 	map.get_or_add(coord, room) 
 	add_child(room)
 	room.position = Vector3(coord.x, 0, coord.y) * room_size
+
+func add_connection(coord, dir: Dir):
+	var door = open_door_prefab.instantiate()
+	add_child(door)
+	door.position = Vector3(coord.x, 0, coord.y) * room_size
+	door.rotation.y = deg_to_rad(dir_rotation.get(dir))
