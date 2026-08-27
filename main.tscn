@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://da1dch38cajg2"]
+
+[ext_resource type="Shader" uid="uid://bk6s4gro7nit8" path="res://trippy-sky.gdshader" id="1_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://3kyhm13y0g45" path="res://first_person_char.tscn" id="1_lquwl"]
+[ext_resource type="Texture2D" uid="uid://btn3aqtw0qcqy" path="res://istockphoto-1158274915-612x612.jpg" id="2_lquwl"]
+[ext_resource type="PackedScene" uid="uid://bk5kauoc33spp" path="res://menu.tscn" id="3_h2yge"]
+[ext_resource type="MeshLibrary" uid="uid://blb2xmtphwx7u" path="res://dungeon_tileset.tres" id="5_lquwl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pyidc"]
+shader = ExtResource("1_1bvp3")
+
+[sub_resource type="Sky" id="Sky_vho56"]
+sky_material = SubResource("ShaderMaterial_pyidc")
+
+[sub_resource type="Environment" id="Environment_vho56"]
+background_mode = 2
+sky = SubResource("Sky_vho56")
+fog_mode = 1
+fog_density = 1.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0035
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_jnlp7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jnlp7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l8v81"]
+albedo_texture = ExtResource("2_lquwl")
+uv1_scale = Vector3(500, 500, 500)
+
+[node name="Main" type="Node3D" unique_id=1651058409]
+
+[node name="Env" type="Node3D" parent="." unique_id=1772404601]
+visible = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Env" unique_id=278456439]
+environment = SubResource("Environment_vho56")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Env" unique_id=783210858]
+transform = Transform3D(0.93647, -0.222677, 0.270995, 0, 0.772623, 0.634865, -0.350747, -0.594533, 0.723538, 4.63347, 1.99902, -2.41443)
+
+[node name="Ground" type="StaticBody3D" parent="Env" unique_id=1079034527]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00945544, 0, 0.00492215)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Env/Ground" unique_id=998650576]
+transform = Transform3D(-1, -1.33442e-14, -8.74228e-08, 0, 1, -1.5264e-07, 8.74228e-08, -1.5264e-07, -1, 0, 0, 0)
+shape = SubResource("WorldBoundaryShape3D_jnlp7")
+
+[node name="Grass" type="MeshInstance3D" parent="Env/Ground" unique_id=545309104]
+transform = Transform3D(-376.632, 0, 0, 0, 0.991937, -5.74889e-05, 0, -1.51409e-07, -376.632, -0.00118208, 0.0128707, -0.0191267)
+layers = 2
+mesh = SubResource("PlaneMesh_jnlp7")
+surface_material_override/0 = SubResource("StandardMaterial3D_l8v81")
+
+[node name="FirstPersonChar" parent="." unique_id=160405242 instance=ExtResource("1_lquwl")]
+
+[node name="Menu" parent="." unique_id=803368180 instance=ExtResource("3_h2yge")]
+
+[node name="GridMap" type="GridMap" parent="." unique_id=919807206]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+mesh_library = ExtResource("5_lquwl")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(65535, 0, 1, 0, 0, 1048577, 1, 65535, 3, 1, 0, 1, 0, 65535, 1048579, 65535, 65535, 1441792, 65535, 65534, 1441792, 65535, 65533, 1441792, 2, 65535, 1048576, 2, 65534, 1048576, 2, 65533, 1048576, 2, 65532, 1048576, 65535, 65532, 1441792, 0, 65531, 655360, 1, 65531, 655360, 65535, 65531, 1441793, 2, 65531, 655361, 1, 65533, 655362, 1, 65532, 655362, 0, 65532, 655362, 0, 65533, 655362, 0, 65534, 655362, 1, 65534, 655362, 2, 0, 1048577, 65535, 3, 1048577)
+}
