@@ -9,6 +9,7 @@ class_name FirstPersonMovement
 
 const sens: int = 150
 var in_debug: bool = true
+var debug_movement: float = 10
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -27,12 +28,11 @@ func _process(_delta: float) -> void:
 	if (Input.is_action_just_pressed("EnterDebugCam")):
 		toggle_debug_cam()
  
-	
 	var sprinting: float = 1
 	if (Input.is_action_pressed("sprint")):
 		sprinting = sprint_speed_mult
 		
-	velocity = global_basis * input * speed * sprinting
+	velocity = global_basis * input * speed * sprinting * debug_movement
 	if (!is_on_floor()):
 		velocity += Vector3.DOWN * 2
 		
@@ -46,11 +46,17 @@ func _input(event: InputEvent) -> void:
 		%Pitch.rotation.x = clamp(%Pitch.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 		
 func toggle_debug_cam():
-		if in_debug:
-			%Pitch.position.y = 50
-			%Pitch.rotation.x = deg_to_rad(-85)
-			in_debug = false
-		else:
+		if !in_debug:
+			debug_movement = 10
 			in_debug = true
+			%Pitch.position.y = 25
+			%Pitch.rotation.x = deg_to_rad(-85)
+			$".".axis_lock_linear_y = true
+			$CapsuleCollider.set_deferred("disabled", true)
+		else:
+			debug_movement = 1
+			in_debug = false
 			%Pitch.position.y = 1
 			%Pitch.rotation.x = deg_to_rad(0)
+			$".".axis_lock_linear_y = false
+			$CapsuleCollider.set_deferred("disabled", false)
