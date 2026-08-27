@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cevd6hnhp5n18"]
+
+[ext_resource type="MeshLibrary" uid="uid://blb2xmtphwx7u" path="res://dungeon_tileset.tres" id="1_7pxmk"]
+
+[node name="DoorTemplate" type="Node3D" unique_id=781738967]
+
+[node name="GridMap" type="GridMap" parent="." unique_id=569204378]
+mesh_library = ExtResource("1_7pxmk")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+
+[node name="Marker3D" type="Marker3D" parent="GridMap" unique_id=1690702219]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, 0)

@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://s6aneujl8ibw"]
+
+[ext_resource type="PackedScene" uid="uid://cevd6hnhp5n18" path="res://doors/door_template.tscn" id="1_fag6y"]
+
+[node name="DoorTemplate" unique_id=781738967 instance=ExtResource("1_fag6y")]
+
+[node name="GridMap" parent="." index="0" unique_id=569204378]
+data = {
+"cells": PackedInt32Array(6, 65535, 655361, 6, 0, 1048577)
+}
