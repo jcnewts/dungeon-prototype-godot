@@ -8,9 +8,11 @@ class_name FirstPersonMovement
 @export var sprint_speed_mult: float = 2
 
 const sens: int = 150
+var in_debug: bool = true
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	toggle_debug_cam()
 
 func _process(_delta: float) -> void:
 	var input: Vector3
@@ -22,6 +24,9 @@ func _process(_delta: float) -> void:
 		input.x += 1
 	if (Input.is_action_pressed("left")):
 		input.x -= 1
+	if (Input.is_action_just_pressed("EnterDebugCam")):
+		toggle_debug_cam()
+ 
 	
 	var sprinting: float = 1
 	if (Input.is_action_pressed("sprint")):
@@ -39,3 +44,13 @@ func _input(event: InputEvent) -> void:
 		rotate_y(deg_to_rad(-mouse_motion.x / sens * PI))
 		%Pitch.rotate_x(deg_to_rad(-mouse_motion.y / sens * PI))
 		%Pitch.rotation.x = clamp(%Pitch.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+		
+func toggle_debug_cam():
+		if in_debug:
+			%Pitch.position.y = 50
+			%Pitch.rotation.x = deg_to_rad(-85)
+			in_debug = false
+		else:
+			in_debug = true
+			%Pitch.position.y = 1
+			%Pitch.rotation.x = deg_to_rad(0)

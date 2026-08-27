@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bk5kauoc33spp"]
 
-[ext_resource type="Script" uid="uid://dll0vdur5ummd" path="res://menu.gd" id="1_1rerr"]
+[ext_resource type="Script" uid="uid://dll0vdur5ummd" path="res://Scripts/Util/menu.gd" id="1_1rerr"]
 
 [node name="Menu" type="Node"]
 process_mode = 3

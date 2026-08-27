@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://3kyhm13y0g45"]
 
-[ext_resource type="Script" uid="uid://cc63fj7v2nh34" path="res://first_person_movement.gd" id="1_ay4nc"]
+[ext_resource type="Script" uid="uid://cc63fj7v2nh34" path="res://Scripts/Player/first_person_movement.gd" id="1_ay4nc"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ay4nc"]
 radius = 0.25
