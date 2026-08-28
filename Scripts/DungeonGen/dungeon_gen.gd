@@ -11,8 +11,10 @@ var map:Dictionary = {}
 
 var current_coord: Vector2i = Vector2i(0, 0)
 
-@export var branch_length: int = 10
+@export var branch_length: int = 5
 @export var branch_count: int = 3
+
+var start_time: float = 0
 
 enum Dir {
 	N,
@@ -61,8 +63,11 @@ const dir_rotation = {
 }
 
 func _ready() -> void:
+	start_time = Time.get_ticks_usec()
 	#place starting room
-	add_room(current_coord, RoomType.STARTING)
+	add_room_placeholder(current_coord)
+	instantiate_room(current_coord, RoomType.STARTING)
+	
 	for i in branch_count:
 		generate_branch(current_coord)
 	
@@ -72,16 +77,24 @@ func _ready() -> void:
 		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
 			if !map[room_data].connections.has(dir):
 				print("Found open door to the ", Dir.find_key(dir), ", filling it in.")
-				# @TODO: add check for existing room later instead of always adding blocked
 				var neighbour = map.get(room_data + dir_vector[dir])
 				print("Checking neighbour: ", neighbour)
 				if neighbour != null:
 					print("Neighbour found: ", map.find_key(neighbour))
 					add_connection(room_data, dir, [DoorType.OPEN, DoorType.BLOCKED].pick_random())
 				else:
-					print("No neighbour found")
 					add_connection(room_data, dir, DoorType.BLOCKED)
-	print("Map gen done!")
+
+	for room_data: Vector2i in map:
+		if room_data == Vector2i.ZERO:
+			continue
+		match map[room_data].connections.size():
+			0:
+				printerr("no connections, this shouldn't be possible")
+		instantiate_room(room_data, RoomType.FOUR_EXIT)
+	var end_time = Time.get_ticks_usec()
+	var total_time = (end_time - start_time) / 1000
+	print("Map gen done! Total generation time: ", total_time, " milliseconds.")
 
 func generate_branch(coord: Vector2i):
 	# loop through branch count, exit early if deadend (no available exits)
@@ -96,13 +109,12 @@ func generate_branch(coord: Vector2i):
 		# convert to vector
 		var dir_vec = dir_vector.get(dir)
 		# add room
-		add_room(coord + dir_vec, RoomType.FOUR_EXIT)
+		add_room_placeholder(coord + dir_vec)
 		# add connection
 		add_connection(coord, dir, DoorType.OPEN)
 		#increment current coord to new coord
 		coord = coord + dir_vec
 		
-
 
 func check_available_dirs(coord) -> Array[Dir]:
 	var available_dirs : Array[Dir] = []
@@ -129,20 +141,23 @@ func pick_dir(dirs :Array[Dir]) -> Dir:
 	print("Dir picked: ", Dir.find_key(pick))
 	return pick
 
-func add_room(coord, type: RoomType):
-	#var room = room_prefab.instantiate()
+func add_room_placeholder(coord): #, type: RoomType
+	var room_data = RoomData.new()
+	room_data.coord = coord
+	map[coord] = room_data
+
+func instantiate_room(coord: Vector2i, type: RoomType):
 	var room
 	match type:
 		RoomType.STARTING:
 			room = starting_room_prefab
-		RoomType.FOUR_EXIT:
+		RoomType.FOUR_EXIT: 
 			room = rooms_4_exits.scenes.pick_random()
 	room = room.instantiate()
-	var room_data = RoomData.new()
-	room_data.id = type
-	map[coord] = room_data
 	add_child(room)
 	room.position = Vector3(coord.x, 0, coord.y) * room_size
+	map[coord].id = type
+	#room_data.id = type
 
 func add_connection(coord: Vector2i, dir: Dir, type: DoorType):
 	var door

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RoomScene" format=3 uid="uid://go6fyh7ftft1"]
+
+[ext_resource type="PackedScene" uid="uid://bih2is74o88ec" path="res://rooms/room_t_2_01.tscn" id="1_tcr7e"]
+[ext_resource type="Script" uid="uid://cbbqje4ikvns6" path="res://Scripts/room_type.gd" id="2_n3153"]
+
+[resource]
+script = ExtResource("2_n3153")
+scenes = Array[PackedScene]([ExtResource("1_tcr7e")])
+metadata/_custom_type_script = "uid://cbbqje4ikvns6"
