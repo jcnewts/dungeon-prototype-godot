@@ -53,6 +53,9 @@ func toggle_debug_cam():
 			%Pitch.rotation.x = deg_to_rad(-85)
 			$".".axis_lock_linear_y = true
 			$CapsuleCollider.set_deferred("disabled", true)
+			%Camera3D.set_projection(Camera3D.PROJECTION_ORTHOGONAL)
+			%Camera3D.set_projection(Camera3D.PROJECTION_ORTHOGONAL)
+			%Camera3D.size = 50
 		else:
 			debug_movement = 1
 			in_debug = false
@@ -60,3 +63,4 @@ func toggle_debug_cam():
 			%Pitch.rotation.x = deg_to_rad(0)
 			$".".axis_lock_linear_y = false
 			$CapsuleCollider.set_deferred("disabled", false)
+			%Camera3D.set_projection(Camera3D.PROJECTION_PERSPECTIVE)
