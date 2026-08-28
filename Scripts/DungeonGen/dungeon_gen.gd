@@ -68,6 +68,18 @@ const dir_rotation = {
 }
 
 func _ready() -> void:
+	generate_dungeon()
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("Regenerate_dungeon"):
+		print("regenerate!")
+		map.clear()
+		for child in get_children():
+			child.queue_free()
+		current_coord = Vector2i.ZERO
+		generate_dungeon()
+
+func generate_dungeon():
 	start_time = Time.get_ticks_usec()
 	#place starting room
 	add_room_placeholder(current_coord)
@@ -147,6 +159,14 @@ func _ready() -> void:
 			instantiate_room(room_data, room_type, room_rotation)
 	var end_time = Time.get_ticks_usec()
 	var total_time = (end_time - start_time) / 1000
+	
+	for room_data: Vector2i in map:
+		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
+			if !map[room_data].connections.has(dir):
+				var neighbour = map.get(room_data + dir_vector[dir])
+				if neighbour != null:
+					add_connection(room_data, dir, DoorType.BLOCKED)
+			
 	print("Map gen done! Total generation time: ", total_time, " milliseconds.")
 
 func generate_branch(coord: Vector2i):
@@ -155,7 +175,7 @@ func generate_branch(coord: Vector2i):
 		# get available dirs
 		var available_dirs = check_available_dirs(coord)
 		if available_dirs.size() == 0:
-			printerr("No available rooms, branch ending!")
+			printerr("No available rooms, branch ending! Branch length: ", i)
 			break
 		# pick dir from available dirs
 		var dir = pick_dir(available_dirs)
