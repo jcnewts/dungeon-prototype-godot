@@ -20,3 +20,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Pitch" unique_id=595992443]
 unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19397211, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1786008962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.295, 0.40471816)
+light_color = Color(0.6431373, 0.6745098, 0.46666667, 1)
+spot_range = 10.4041395
+spot_angle = 65.35594

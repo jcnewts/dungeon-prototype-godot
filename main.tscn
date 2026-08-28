@@ -12,14 +12,16 @@ background_mode = 2
 sky = SubResource("Sky_vho56")
 ambient_light_color = Color(0.6431373, 0.6745098, 0.46666667, 1)
 ambient_light_sky_contribution = 0.0
-ambient_light_energy = 0.02
+ambient_light_energy = 0.01
 fog_enabled = true
 fog_mode = 1
 fog_light_color = Color(0.6431373, 0.6745098, 0.46666667, 1)
-fog_light_energy = 0.41
-fog_density = 0.6639
+fog_light_energy = 0.02
+fog_density = 1.0
+fog_sky_affect = 0.0
+fog_depth_curve = 0.6830198
 fog_depth_begin = 0.0
-fog_depth_end = 20.0
+fog_depth_end = 7.7
 volumetric_fog_density = 0.0
 
 [node name="Main" type="Node3D" unique_id=1651058409]
