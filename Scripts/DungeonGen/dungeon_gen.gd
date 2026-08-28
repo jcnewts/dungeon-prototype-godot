@@ -17,6 +17,8 @@ var current_coord: Vector2i = Vector2i(0, 0)
 
 @export var branch_length: int = 10
 @export var branch_count: int = 4
+@export var step_through: bool = false
+@export var step_length: float = 0.1
 
 var start_time: float = 0
 
@@ -86,11 +88,13 @@ func generate_dungeon():
 	instantiate_room(current_coord, RoomType.STARTING)
 	
 	for i in branch_count:
-		generate_branch(current_coord)
+		if step_through: await generate_branch(current_coord)
+		else: generate_branch(current_coord)
 	
 	# Add missing connections, or close off rooms.
 	for room_data: Vector2i in map:
 		#print(room_data)
+		if step_through: await get_tree().create_timer(step_length).timeout
 		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
 			if !map[room_data].connections.has(dir):
 				print("Found open door to the ", Dir.find_key(dir), ", filling it in.")
@@ -106,6 +110,7 @@ func generate_dungeon():
 	for room_data: Vector2i in map:
 		#if room_data == Vector2i.ZERO:
 			#continue
+		if step_through: await get_tree().create_timer(step_length).timeout
 		var connections = map[room_data].connections
 		var num_connections = connections.size()
 		print("Room: ", room_data, ", Connections: ", map[room_data].connections)
@@ -172,6 +177,7 @@ func generate_dungeon():
 func generate_branch(coord: Vector2i):
 	# loop through branch count, exit early if deadend (no available exits)
 	for i in branch_length:
+		if step_through: await get_tree().create_timer(step_length).timeout
 		# get available dirs
 		var available_dirs = check_available_dirs(coord)
 		if available_dirs.size() == 0:
@@ -187,6 +193,7 @@ func generate_branch(coord: Vector2i):
 		add_connection(coord, dir, DoorType.OPEN)
 		#increment current coord to new coord
 		coord = coord + dir_vec
+
 		
 
 func check_available_dirs(coord) -> Array[Dir]:
