@@ -5,11 +5,11 @@ const room_size: int = 12 + 1
 @export var starting_room_prefab = preload("res://rooms/room_t_01.tscn")
 @export var open_door_prefab = preload("res://doors/door_open.tscn")
 @export var blocked_door_prefab = preload("res://doors/door_closed.tscn")
-@export var rooms_4_exits: RoomScene = preload("res://RoomType_4.tres")
-@export var rooms_3_exits: RoomScene = preload("res://RoomType_3.tres")
-@export var rooms_2_exits: RoomScene = preload("res://RoomType_2.tres")
-@export var rooms_2L_exits: RoomScene = preload("res://RoomType_2L.tres")
-@export var rooms_1_exit: RoomScene = preload("res://RoomType_1.tres")
+@export var rooms_4_exits: RoomScene = preload("res://RoomTypes/RoomTypes_4exit.tres")
+@export var rooms_3_exits: RoomScene = preload("res://RoomTypes/RoomTypes_3exit.tres")
+@export var rooms_2_exits: RoomScene = preload("res://RoomTypes/RoomTypes_2exit_Hallway.tres")
+@export var rooms_2L_exits: RoomScene = preload("res://RoomTypes/RoomTypes_2exit_L.tres")
+@export var rooms_1_exit: RoomScene = preload("res://RoomTypes/RoomTypes_1exit.tres")
 
 var map:Dictionary = {}
 
