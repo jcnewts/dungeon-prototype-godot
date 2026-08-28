@@ -55,16 +55,16 @@ enum DoorType {
 
 const dir_vector = {
 	Dir.E : Vector2i(1, 0),
-	Dir.S : Vector2i(0, -1),
+	Dir.S : Vector2i(0, 1),
 	Dir.W : Vector2i(-1, 0),
-	Dir.N : Vector2i(0, 1),
+	Dir.N : Vector2i(0, -1),
 }
 
 const dir_rotation = {
 	Dir.E : 0,
-	Dir.S : 90,
+	Dir.N : 90,
 	Dir.W : 180,
-	Dir.N : 270
+	Dir.S : 270
 }
 
 func _ready() -> void:
@@ -121,19 +121,19 @@ func _ready() -> void:
 						room_type = RoomType.TWO_HALLWAY
 					elif connections.has(Dir.N) and connections.has(Dir.E):
 						room_type = RoomType.TWO_L 
+						room_rotation = deg_to_rad(90)
 					elif connections.has(Dir.S) and connections.has(Dir.E):
 						room_type = RoomType.TWO_L 
-						room_rotation = deg_to_rad(90)
 					elif connections.has(Dir.W) and connections.has(Dir.S):
 						room_type = RoomType.TWO_L 
-						room_rotation = deg_to_rad(180)
+						room_rotation = deg_to_rad(270)
 					elif connections.has(Dir.N) and connections.has(Dir.W):
 						room_type = RoomType.TWO_L 
-						room_rotation = deg_to_rad(270)
+						room_rotation = deg_to_rad(180)
 				3:
 					print("3 connections")
 					if connections.has(Dir.W) and connections.has(Dir.E):
-						if connections.has(Dir.S):
+						if connections.has(Dir.N):
 							room_rotation = deg_to_rad(180)
 					if connections.has(Dir.N) and connections.has(Dir.S):
 						if connections.has(Dir.E):
