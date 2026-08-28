@@ -15,8 +15,8 @@ var map:Dictionary = {}
 
 var current_coord: Vector2i = Vector2i(0, 0)
 
-@export var branch_length: int = 5
-@export var branch_count: int = 3
+@export var branch_length: int = 10
+@export var branch_count: int = 4
 
 var start_time: float = 0
 
