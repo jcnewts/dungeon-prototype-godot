@@ -10,7 +10,9 @@ const room_size: int = 12 + 1
 var map:Dictionary = {}
 
 var current_coord: Vector2i = Vector2i(0, 0)
-var branch_count: int = 3
+
+@export var branch_length: int = 10
+@export var branch_count: int = 3
 
 enum Dir {
 	N,
@@ -59,15 +61,27 @@ const dir_rotation = {
 }
 
 func _ready() -> void:
-	generate_branch()
-
-func generate_branch():
 	#place starting room
 	add_room(current_coord, RoomType.STARTING)
-	# loop through branch count, exit early if deadend (no available exits)
 	for i in branch_count:
+		generate_branch(current_coord)
+	
+	# Add missing connections, or close off rooms.
+	for room_data: Vector2i in map:
+		print(room_data)
+		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
+			if !map[room_data].connections.has(dir):
+				print("Found open door to the ", Dir.find_key(dir), ", filling it in.")
+				# @TODO: add check for existing room later instead of always adding blocked 
+				add_connection(room_data, dir, DoorType.BLOCKED)
+			print(Dir.find_key(dir))
+	print("Map gen done!")
+
+func generate_branch(coord: Vector2i):
+	# loop through branch count, exit early if deadend (no available exits)
+	for i in branch_length:
 		# get available dirs
-		var available_dirs = check_available_dirs(current_coord)
+		var available_dirs = check_available_dirs(coord)
 		if available_dirs.size() == 0:
 			printerr("No available rooms, branch ending!")
 			break
@@ -76,21 +90,13 @@ func generate_branch():
 		# convert to vector
 		var dir_vec = dir_vector.get(dir)
 		# add room
-		add_room(current_coord + dir_vec, RoomType.FOUR_EXIT)
+		add_room(coord + dir_vec, RoomType.FOUR_EXIT)
 		# add connection
-		add_connection(current_coord, dir, DoorType.OPEN)
+		add_connection(coord, dir, DoorType.OPEN)
 		#increment current coord to new coord
-		current_coord = current_coord + dir_vec
-	for room_data: Vector2i in map:
-		print(room_data)
-		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
-			if !map[room_data].connections.has(dir):
-				print("Open door:", Dir.find_key(dir))
-				print("Data type: ", type_string(typeof(room_data)))
-				# @TODO: add check for existing room later instead of always adding blocked 
-				add_connection(room_data, dir, DoorType.BLOCKED)
-			print(Dir.find_key(dir))
-	print("Map gen done!")
+		coord = coord + dir_vec
+		
+
 
 func check_available_dirs(coord) -> Array[Dir]:
 	var available_dirs : Array[Dir] = []
@@ -147,7 +153,7 @@ func add_connection(coord: Vector2i, dir: Dir, type: DoorType):
 	if neighbouring_room != null:
 		neighbouring_room.connections.append(opposite_dir(dir))
 	else: 
-		print("no neighbouring room found, not adding connection")
+		print("No neighbouring room found, not adding connection")
 	door.position = Vector3(coord.x, 0, coord.y) * room_size
 	door.rotation.y = deg_to_rad(dir_rotation.get(dir))
 
