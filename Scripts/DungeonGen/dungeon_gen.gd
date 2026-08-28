@@ -4,9 +4,13 @@ const room_size: int = 12 + 1
 
 @export var starting_room_prefab = preload("res://rooms/room_t_01.tscn")
 @export var open_door_prefab = preload("res://doors/door_open.tscn")
-@export var rooms_4_exits: RoomType = preload("res://RoomType_4.tres")
+@export var blocked_door_prefab = preload("res://doors/door_closed.tscn")
+@export var rooms_4_exits: RoomScene = preload("res://RoomType_4.tres")
 
 var map:Dictionary = {}
+
+var current_coord: Vector2i = Vector2i(0, 0)
+var branch_count: int = 3
 
 enum Dir {
 	N,
@@ -15,12 +19,29 @@ enum Dir {
 	W
 }
 
-enum RoomTypes {
+func opposite_dir(dir: Dir):
+	match dir:
+		Dir.N:
+			return Dir.S
+		Dir.S:
+			return Dir.N
+		Dir.E:
+			return Dir.W
+		Dir.W:
+			return Dir.E
+
+enum RoomType {
 	STARTING,
 	FOUR_EXIT,
 	#THREE_EXIT,
 	#TWO_HALLWAY,
 	#TWO_L,
+}
+
+enum DoorType {
+	OPEN,
+	BLOCKED,
+	LOCKED
 }
 
 const dir_vector = {
@@ -37,15 +58,12 @@ const dir_rotation = {
 	Dir.N : 270
 }
 
-var current_coord: Vector2i = Vector2i(0, 0)
-var branch_count: int = 10
-
 func _ready() -> void:
 	generate_branch()
-	
+
 func generate_branch():
 	#place starting room
-	add_room(current_coord, RoomTypes.STARTING)
+	add_room(current_coord, RoomType.STARTING)
 	# loop through branch count, exit early if deadend (no available exits)
 	for i in branch_count:
 		# get available dirs
@@ -58,9 +76,21 @@ func generate_branch():
 		# convert to vector
 		var dir_vec = dir_vector.get(dir)
 		# add room
-		add_room(current_coord + dir_vec, RoomTypes.FOUR_EXIT)
-		add_connection(current_coord, dir)
-		current_coord = current_coord + dir_vec 
+		add_room(current_coord + dir_vec, RoomType.FOUR_EXIT)
+		# add connection
+		add_connection(current_coord, dir, DoorType.OPEN)
+		#increment current coord to new coord
+		current_coord = current_coord + dir_vec
+	for room_data: Vector2i in map:
+		print(room_data)
+		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
+			if !map[room_data].connections.has(dir):
+				print("Open door:", Dir.find_key(dir))
+				print("Data type: ", type_string(typeof(room_data)))
+				# @TODO: add check for existing room later instead of always adding blocked 
+				add_connection(room_data, dir, DoorType.BLOCKED)
+			print(Dir.find_key(dir))
+	print("Map gen done!")
 
 func check_available_dirs(coord) -> Array[Dir]:
 	var available_dirs : Array[Dir] = []
@@ -76,7 +106,7 @@ func check_available_dirs(coord) -> Array[Dir]:
 
 func check_coord_available(coord: Vector2i) -> bool:
 	if map.has(coord):
-		#print("Coord blocked, map has ", coord, ": ", map.get(coord).name) 
+		print("Coord blocked, map has ", coord, ": ", RoomType.find_key(map.get(coord).id)) 
 		return false
 	else:
 		#print("Coord available, map does not have ", coord)
@@ -87,21 +117,41 @@ func pick_dir(dirs :Array[Dir]) -> Dir:
 	print("Dir picked: ", Dir.find_key(pick))
 	return pick
 
-func add_room(coord, type: RoomTypes):
+func add_room(coord, type: RoomType):
 	#var room = room_prefab.instantiate()
 	var room
 	match type:
-		RoomTypes.STARTING:
+		RoomType.STARTING:
 			room = starting_room_prefab
-		RoomTypes.FOUR_EXIT:
+		RoomType.FOUR_EXIT:
 			room = rooms_4_exits.scenes.pick_random()
 	room = room.instantiate()
-	map.get_or_add(coord, room) 
+	var room_data = RoomData.new()
+	room_data.id = type
+	map[coord] = room_data
 	add_child(room)
 	room.position = Vector3(coord.x, 0, coord.y) * room_size
 
-func add_connection(coord, dir: Dir):
-	var door = open_door_prefab.instantiate()
+func add_connection(coord: Vector2i, dir: Dir, type: DoorType):
+	var door
+	match type:
+		DoorType.OPEN:
+			door = open_door_prefab.instantiate()
+		DoorType.BLOCKED :
+			door = blocked_door_prefab.instantiate()
 	add_child(door)
+	# add connection to the room data
+	map.get(coord).connections.append(dir)
+	# add connection to the next room, in the opposite dir - both rooms know about the connection
+	var neighbouring_room = map.get(coord + dir_vector.get(dir))
+	if neighbouring_room != null:
+		neighbouring_room.connections.append(opposite_dir(dir))
+	else: 
+		print("no neighbouring room found, not adding connection")
 	door.position = Vector3(coord.x, 0, coord.y) * room_size
 	door.rotation.y = deg_to_rad(dir_rotation.get(dir))
+
+class RoomData:
+	var id: int
+	var coord: Vector2i
+	var connections: Array[Dir]

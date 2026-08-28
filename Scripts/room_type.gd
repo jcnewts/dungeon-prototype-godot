@@ -1,5 +1,5 @@
 extends Resource
-class_name RoomType
+class_name RoomScene
 
 @export var name: String
 @export var scenes: Array[PackedScene]
