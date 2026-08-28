@@ -6,5 +6,5 @@
 
 [node name="GridMap" parent="." index="0" unique_id=569204378]
 data = {
-"cells": PackedInt32Array(6, 65535, 655361, 6, 0, 1048577)
+"cells": PackedInt32Array(6, 65535, 1048581, 6, 0, 1441797)
 }
