@@ -68,13 +68,19 @@ func _ready() -> void:
 	
 	# Add missing connections, or close off rooms.
 	for room_data: Vector2i in map:
-		print(room_data)
+		#print(room_data)
 		for dir in [Dir.N, Dir.S, Dir.E, Dir.W]:
 			if !map[room_data].connections.has(dir):
 				print("Found open door to the ", Dir.find_key(dir), ", filling it in.")
-				# @TODO: add check for existing room later instead of always adding blocked 
-				add_connection(room_data, dir, DoorType.BLOCKED)
-			print(Dir.find_key(dir))
+				# @TODO: add check for existing room later instead of always adding blocked
+				var neighbour = map.get(room_data + dir_vector[dir])
+				print("Checking neighbour: ", neighbour)
+				if neighbour != null:
+					print("Neighbour found: ", map.find_key(neighbour))
+					add_connection(room_data, dir, [DoorType.OPEN, DoorType.BLOCKED].pick_random())
+				else:
+					print("No neighbour found")
+					add_connection(room_data, dir, DoorType.BLOCKED)
 	print("Map gen done!")
 
 func generate_branch(coord: Vector2i):
