@@ -6,6 +6,10 @@ const room_size: int = 12 + 1
 @export var open_door_prefab = preload("res://doors/door_open.tscn")
 @export var blocked_door_prefab = preload("res://doors/door_closed.tscn")
 @export var rooms_4_exits: RoomScene = preload("res://RoomType_4.tres")
+@export var rooms_3_exits: RoomScene = preload("res://RoomType_3.tres")
+@export var rooms_2_exits: RoomScene = preload("res://RoomType_2.tres")
+@export var rooms_2L_exits: RoomScene = preload("res://RoomType_2L.tres")
+@export var rooms_1_exit: RoomScene = preload("res://RoomType_1.tres")
 
 var map:Dictionary = {}
 
@@ -37,9 +41,10 @@ func opposite_dir(dir: Dir):
 enum RoomType {
 	STARTING,
 	FOUR_EXIT,
-	#THREE_EXIT,
-	#TWO_HALLWAY,
-	#TWO_L,
+	THREE_EXIT,
+	TWO_HALLWAY,
+	TWO_L,
+	DEADEND,
 }
 
 enum DoorType {
@@ -49,10 +54,10 @@ enum DoorType {
 }
 
 const dir_vector = {
-	Dir.N : Vector2i(0, 1),
-	Dir.S : Vector2i(0, -1),
 	Dir.E : Vector2i(1, 0),
+	Dir.S : Vector2i(0, -1),
 	Dir.W : Vector2i(-1, 0),
+	Dir.N : Vector2i(0, 1),
 }
 
 const dir_rotation = {
@@ -81,17 +86,65 @@ func _ready() -> void:
 				print("Checking neighbour: ", neighbour)
 				if neighbour != null:
 					print("Neighbour found: ", map.find_key(neighbour))
-					add_connection(room_data, dir, [DoorType.OPEN, DoorType.BLOCKED].pick_random())
-				else:
-					add_connection(room_data, dir, DoorType.BLOCKED)
+					if randf() < 0.5:
+						add_connection(room_data, dir, DoorType.OPEN)
+				#else:
+					#add_connection(room_data, dir, DoorType.BLOCKED)
 
 	for room_data: Vector2i in map:
-		if room_data == Vector2i.ZERO:
-			continue
-		match map[room_data].connections.size():
-			0:
-				printerr("no connections, this shouldn't be possible")
-		instantiate_room(room_data, RoomType.FOUR_EXIT)
+		#if room_data == Vector2i.ZERO:
+			#continue
+		var connections = map[room_data].connections
+		var num_connections = connections.size()
+		print("Room: ", room_data, ", Connections: ", map[room_data].connections)
+		if map[room_data].id == -1: # -1 means no id yet (no room spawned)
+			var room_type
+			var room_rotation = 0
+			match num_connections:
+				0:
+					printerr("No connections, this shouldn't be possible")
+				1:
+					print("1 connection")
+					if connections.has(Dir.N):
+						room_rotation = deg_to_rad(90)
+					if connections.has(Dir.E):
+						room_rotation = deg_to_rad(180)
+					if connections.has(Dir.S):
+						room_rotation = deg_to_rad(270)
+					room_type = RoomType.DEADEND
+				2:
+					print("2 connections")
+					if connections.has(Dir.N) and connections.has(Dir.S):
+						room_type = RoomType.TWO_HALLWAY
+						room_rotation = deg_to_rad(90)
+					elif connections.has(Dir.W) and connections.has(Dir.E):
+						room_type = RoomType.TWO_HALLWAY
+					elif connections.has(Dir.N) and connections.has(Dir.E):
+						room_type = RoomType.TWO_L 
+					elif connections.has(Dir.S) and connections.has(Dir.E):
+						room_type = RoomType.TWO_L 
+						room_rotation = deg_to_rad(90)
+					elif connections.has(Dir.W) and connections.has(Dir.S):
+						room_type = RoomType.TWO_L 
+						room_rotation = deg_to_rad(180)
+					elif connections.has(Dir.N) and connections.has(Dir.W):
+						room_type = RoomType.TWO_L 
+						room_rotation = deg_to_rad(270)
+				3:
+					print("3 connections")
+					if connections.has(Dir.W) and connections.has(Dir.E):
+						if connections.has(Dir.S):
+							room_rotation = deg_to_rad(180)
+					if connections.has(Dir.N) and connections.has(Dir.S):
+						if connections.has(Dir.E):
+							room_rotation = deg_to_rad(90)
+						else:
+							room_rotation = deg_to_rad(270)
+					room_type = RoomType.THREE_EXIT
+				4:
+					print("4 connections")
+					room_type = RoomType.FOUR_EXIT
+			instantiate_room(room_data, room_type, room_rotation)
 	var end_time = Time.get_ticks_usec()
 	var total_time = (end_time - start_time) / 1000
 	print("Map gen done! Total generation time: ", total_time, " milliseconds.")
@@ -146,16 +199,27 @@ func add_room_placeholder(coord): #, type: RoomType
 	room_data.coord = coord
 	map[coord] = room_data
 
-func instantiate_room(coord: Vector2i, type: RoomType):
+func instantiate_room(coord: Vector2i, type: RoomType, orientation: float = 0):
 	var room
 	match type:
 		RoomType.STARTING:
 			room = starting_room_prefab
 		RoomType.FOUR_EXIT: 
 			room = rooms_4_exits.scenes.pick_random()
+		RoomType.THREE_EXIT: 
+			room = rooms_3_exits.scenes.pick_random()
+		RoomType.TWO_HALLWAY: 
+			room = rooms_2_exits.scenes.pick_random()
+		RoomType.TWO_L: 
+			room = rooms_2L_exits.scenes.pick_random()
+		RoomType.DEADEND: 
+			room = rooms_1_exit.scenes.pick_random()
+		_:
+			printerr("tried to spawn room of type:", RoomType.find_key(type))
 	room = room.instantiate()
 	add_child(room)
 	room.position = Vector3(coord.x, 0, coord.y) * room_size
+	room.rotation.y = orientation
 	map[coord].id = type
 	#room_data.id = type
 
@@ -179,6 +243,6 @@ func add_connection(coord: Vector2i, dir: Dir, type: DoorType):
 	door.rotation.y = deg_to_rad(dir_rotation.get(dir))
 
 class RoomData:
-	var id: int
+	var id: int = -1
 	var coord: Vector2i
 	var connections: Array[Dir]

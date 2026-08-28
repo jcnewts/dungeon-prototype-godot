@@ -25,7 +25,7 @@ fog_depth_end = 7.7
 volumetric_fog_density = 0.0
 
 [node name="Main" type="Node3D" unique_id=1651058409]
-transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
+transform = Transform3D(0.9999999, 0, 0, 0, 1, 0, 0, 0, 0.9999999, 0, 0, 0)
 
 [node name="Env" type="Node3D" parent="." unique_id=1772404601]
 
@@ -33,6 +33,7 @@ transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 0, 0, 0)
 environment = SubResource("Environment_vho56")
 
 [node name="FirstPersonChar" parent="." unique_id=160405242 instance=ExtResource("1_lquwl")]
+transform = Transform3D(0.9999999, 0, 1.4210856e-14, 0, 1, 0, -1.4210856e-14, 0, 0.9999999, 0, 0, 0)
 
 [node name="Menu" parent="." unique_id=803368180 instance=ExtResource("3_h2yge")]
 
